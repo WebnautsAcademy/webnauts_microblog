@@ -2,6 +2,8 @@ import uuid
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+
+from .mailer import notify_admin_new_user
 from .managers import CustomUserManager
 
 
@@ -26,3 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            notify_admin_new_user(self.email)
+        super(User, self).save(*args, **kwargs)
