@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container box">
+    <h1>{{object.title}}</h1>
+    <p>author: {{ object.user }}, created at: {{ object.created_at }}    </p>
+
+    <img src="{{ object.file.url }}">
+</div>
+{% endblock content %}

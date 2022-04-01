@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container box">
+    <h1>Список постов всех постов </h1>
+    {% for post in object_list %}
+        <ul>
+            <li>Post id: {{post.id}}, post title: {{ post.title }}, author: {{ post.user }}, created: {{ post.created_at }},
+                <a href="{% url 'post_detail' post.id %}">детали</a>, <a href="{% url 'update_post' post.id %}">редактировать</a>,
+                <a href="{% url 'delete_post' post.id %}">удалить</a>
+            </li>
+        </ul>
+    {% endfor %}
+    <a href="{% url 'create_post' %}"><p>Добавить пост</p></a>
+</div>
+{% endblock content %}
