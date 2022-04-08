@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'django_cleanup.apps.CleanupConfig',
+    'debug_toolbar',
 
     # my_apps
     'users',
@@ -45,9 +46,14 @@ INSTALLED_APPS = [
     'gallery',
 ]
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 SITE_ID = 1
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware', # Django Debug
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -172,3 +178,5 @@ EMAIL_USE_TLS = True
 ADMINS = [('Admin', os.environ.get('EMAIL_HOST_USER'))]
 
 GRAPPELLI_ADMIN_TITLE = 'SuperAdminka'
+
+MAX_FILE_SIZE = int(os.environ.get('MAX_FILE_SIZE_IN_MB', 2))

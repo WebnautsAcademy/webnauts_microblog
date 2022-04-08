@@ -1,23 +1,34 @@
 from django.urls import reverse_lazy
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
+
+from .mixins import OwnerOrReadOnly
 from .models import Post
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import PostForm
 
 
 def post_list(request):
     posts = Post.objects.all()
-    return render(request, 'gallery/post_list.html', {'posts': posts})
+    return render(request, 'gallery/post_list.html', {'object_list': posts})
 
 
 def post_detail(request, id):
     post = get_object_or_404(Post, id=id)
     return render(request, 'gallery/post_detail.html', {'object': post})
+
+
+def post_likes(request, pk):
+    post = get_object_or_404(Post, id=pk)
+    page = request.GET.get('page', 1)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+    return redirect(reverse('post_list') + f"?page={page}")
 
 
 def create_post(request):
@@ -34,26 +45,40 @@ def create_post(request):
 
 class PostList(ListView):
     model = Post
-    # paginate_by = 2
+    paginate_by = 4
+
+    # def get_queryset(self):
+    #     qs = Post.objects.select_related('user').prefetch_related('likes')
+    #     return qs
 
 
 class PostDetail(DetailView):
     model = Post
 
+    # def get_object(self, queryset=None):
+    #     return super(PostDetail, self).get_object().select_related('user').prefetch_related('likes')
 
-class PostCreate(CreateView):
+    def get_queryset(self):
+        return super(PostDetail, self).get_queryset().select_related('user').prefetch_related('likes')
+
+
+class PostCreate(LoginRequiredMixin, CreateView):
     model = Post
     fields = ('title', 'file', 'description')
     success_url = '/gallery/'
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
-class PostUpdate(UpdateView):
+
+class PostUpdate(OwnerOrReadOnly, UpdateView):
     model = Post
     fields = ('title', 'file', 'description')
     template_name_suffix = "_update_form"
     success_url = '/gallery/'
 
 
-class PostDelete(DeleteView):
+class PostDelete(OwnerOrReadOnly, DeleteView):
     model = Post
     success_url = reverse_lazy('post_list')
