@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 
 from .mixins import OwnerOrReadOnly
-from .models import Post
+from .models import Post, Comment
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -21,8 +21,8 @@ def post_detail(request, id):
     return render(request, 'gallery/post_detail.html', {'object': post})
 
 
-def post_likes(request, pk):
-    post = get_object_or_404(Post, id=pk)
+def post_likes(request, slug):
+    post = get_object_or_404(Post, slug=slug)
     page = request.GET.get('page', 1)
     if request.user in post.likes.all():
         post.likes.remove(request.user)
@@ -59,7 +59,10 @@ class PostDetail(DetailView):
     #     return super(PostDetail, self).get_object().select_related('user').prefetch_related('likes')
 
     def get_queryset(self):
-        return super(PostDetail, self).get_queryset().select_related('user').prefetch_related('likes')
+        return super(PostDetail, self).get_queryset().\
+            select_related('user').\
+            prefetch_related('likes').\
+            prefetch_related('comments')
 
 
 class PostCreate(LoginRequiredMixin, CreateView):
@@ -82,3 +85,16 @@ class PostUpdate(OwnerOrReadOnly, UpdateView):
 class PostDelete(OwnerOrReadOnly, DeleteView):
     model = Post
     success_url = reverse_lazy('post_list')
+
+
+def create_comment(request, slug):
+    if request.method == 'POST':
+        text = request.POST.get('comment')
+        parent_id = request.POST.get('parent_id')
+        if parent_id == "":
+            parent_id = None
+        post = get_object_or_404(Post, slug=slug)
+        comment = Comment.objects.create(
+            title=text, user=request.user, post=post, parent_id=parent_id
+        )
+    return redirect('post_detail', post.slug)

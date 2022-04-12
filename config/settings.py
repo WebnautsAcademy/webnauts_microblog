@@ -179,4 +179,4 @@ ADMINS = [('Admin', os.environ.get('EMAIL_HOST_USER'))]
 
 GRAPPELLI_ADMIN_TITLE = 'SuperAdminka'
 
-MAX_FILE_SIZE = int(os.environ.get('MAX_FILE_SIZE_IN_MB', 2))
+MAX_FILE_SIZE = int(os.environ.get('MAX_FILE_SIZE_IN_MB', 10))

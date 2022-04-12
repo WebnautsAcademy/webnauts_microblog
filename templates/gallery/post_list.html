@@ -21,11 +21,11 @@
                 </div>
             </div>
             <footer class="card-footer">
-                <a class="card-footer-item" href="{% url 'post_detail' post.id %}">
+                <a class="card-footer-item" href="{% url 'post_detail' post.slug %}">
                   <i class="fa-solid fa-asterisk"></i>
                 </a>
                 {% if user.is_authenticated %}
-                    <a class="card-footer-item" href="{% url 'post_likes' post.id %}?page={{ page_obj.number }}">
+                    <a class="card-footer-item" href="{% url 'post_likes' post.slug %}?page={{ page_obj.number }}">
                       {% if user in post.likes.all %}
                         <i class="fa-solid fa-heart has-text-danger"></i>
                       {% else %}
@@ -34,10 +34,10 @@
                     </a>
                 {% endif %}
                 {% if request.user.id == post.user.id %}
-                <a class="card-footer-item" href="{% url 'update_post' post.id %}">
+                <a class="card-footer-item" href="{% url 'update_post' post.slug %}">
                   <i class="fa-solid fa-pencil"></i>
                 </a>
-                <a class="card-footer-item" href="{% url 'delete_post' post.id %}">
+                <a class="card-footer-item" href="{% url 'delete_post' post.slug %}">
                   <i class="fa-solid fa-trash"></i>
                 </a>
                 {% endif %}
