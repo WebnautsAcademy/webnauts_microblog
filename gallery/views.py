@@ -9,6 +9,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import PostForm
+from .filters import PostFilterSet
 
 
 def post_list(request):
@@ -45,11 +46,12 @@ def create_post(request):
 
 class PostList(ListView):
     model = Post
-    paginate_by = 4
+    paginate_by = 2
 
-    # def get_queryset(self):
-    #     qs = Post.objects.select_related('user').prefetch_related('likes')
-    #     return qs
+    def get_queryset(self):
+        qs = Post.objects.select_related('user').prefetch_related('likes')
+        filtered_list = PostFilterSet(self.request.GET, queryset=qs)
+        return filtered_list.qs
 
 
 class PostDetail(DetailView):

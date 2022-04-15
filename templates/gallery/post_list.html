@@ -12,7 +12,7 @@
         <div class="card">
             <div class="card-image">
                 <figure class="image is-3by2">
-                  <img src="{{post.file.url}}" alt="">
+                  <img src="{{post.file_thumb.url}}" alt="">
                 </figure>
                 <div class="card-content is-overlay is-clipped">
                   <span class="tag is-info">
@@ -54,9 +54,10 @@
     <a href="{% url 'create_post' %}"><p>Добавить пост</p></a>
     <hr>
     <div class="container has-text-centered">
+        {% load my_tags %}
         {% if page_obj.has_previous %}
-            <a href="?page=1" class="icon has-text-danger"><i class="fa-solid fa-angles-left"></i></a>
-            <a href="?page={{ page_obj.previous_page_number }}" class="icon has-text-danger"><i class="fa-solid fa-angle-left"></i></a>
+            <a href="?{% param_replace page=1 %}" class="icon has-text-danger"><i class="fa-solid fa-angles-left"></i></a>
+            <a href="?{% param_replace page=page_obj.previous_page_number %}" class="icon has-text-danger"><i class="fa-solid fa-angle-left"></i></a>
         {% endif %}
 
         <span class="current">
@@ -64,8 +65,8 @@
         </span>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="icon has-text-danger"><i class="fa-solid fa-angle-right"></i></a>
-            <a href="?page={{ page_obj.paginator.num_pages }}" class="icon has-text-danger"><i class="fa-solid fa-angles-right"></i></a>
+            <a href="?{% param_replace page=page_obj.next_page_number %}" class="icon has-text-danger"><i class="fa-solid fa-angle-right"></i></a>
+            <a href="?{% param_replace page=page_obj.paginator.num_pages %}" class="icon has-text-danger"><i class="fa-solid fa-angles-right"></i></a>
         {% endif %}
 
     </div>

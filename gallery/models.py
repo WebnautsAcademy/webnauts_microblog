@@ -3,6 +3,9 @@ from django.core.validators import FileExtensionValidator
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
+from imagekit.models import ImageSpecField, ProcessedImageField
+from imagekit import processors
+
 from .utils import unique_slug_generator
 from .validators import validate_size
 from users.models import User
@@ -20,7 +23,14 @@ class ModelWithTS(models.Model):
 
 class Post(ModelWithTS):
     slug = models.SlugField(unique=True, )
-    file = models.FileField(upload_to='post_files/', validators=[validate_size])
+    file = ProcessedImageField(
+        upload_to='post_files/', processors=[processors.ResizeToFit(width=1400, upscale=False)],
+        format='JPEG', options={'quality': 90}
+    )
+    file_thumb = ImageSpecField(
+        source='file', processors=[processors.SmartResize(450, 300)],
+        format='JPEG', options={'quality': 80}
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='posts')
     description = models.TextField(null=True, blank=True)
     likes = models.ManyToManyField(User)
@@ -30,6 +40,9 @@ class Post(ModelWithTS):
         if self.title:
             return self.title
         return f"Post id: {self.id}"
+
+    class Meta:
+        ordering = ['-id']
 
 
 class Comment(ModelWithTS):

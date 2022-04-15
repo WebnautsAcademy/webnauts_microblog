@@ -9,8 +9,9 @@ class CommentInline(admin.TabularInline):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'user']
+    list_display = ['title', 'slug', 'description']
     # prepopulated_fields = {'slug': ('title',)}
+    list_editable = ['description']
     inlines = [CommentInline]
 
     def save_model(self, request, obj, form, change):

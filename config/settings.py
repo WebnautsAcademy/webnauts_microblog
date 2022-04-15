@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'users',
     'admin_test',
     'gallery',
+    'imagekit',
+    'django_filters'
 ]
 
 INTERNAL_IPS = [
