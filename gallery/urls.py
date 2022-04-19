@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
 from . import views
 
 urlpatterns = [
@@ -12,5 +13,4 @@ urlpatterns = [
     path('<slug:slug>/likes/', views.post_likes, name='post_likes'),
     # path('create_post/', views.create_post, name='create_post'),
     path('<slug:slug>/create_comment', views.create_comment, name='create_comment'),
-
 ]

@@ -2,7 +2,8 @@ import os
 
 from pathlib import Path
 from dotenv import load_dotenv
-
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 load_dotenv('./.env')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -13,14 +14,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@3#277!n_orm@4nsxt0xsw_hfs+$u77e79li&w#%dg_rsf4774'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get('DEBUG'))
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split()
-
-
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -182,3 +183,26 @@ ADMINS = [('Admin', os.environ.get('EMAIL_HOST_USER'))]
 GRAPPELLI_ADMIN_TITLE = 'SuperAdminka'
 
 MAX_FILE_SIZE = int(os.environ.get('MAX_FILE_SIZE_IN_MB', 10))
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': BASE_DIR / 'file_cache/',
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+sentry_sdk.init(
+    dsn=os.environ.get('SENTRY_DSN'),
+    integrations=[DjangoIntegration()],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)

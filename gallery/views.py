@@ -8,6 +8,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+
 from .forms import PostForm
 from .filters import PostFilterSet
 
@@ -46,7 +47,7 @@ def create_post(request):
 
 class PostList(ListView):
     model = Post
-    paginate_by = 2
+    paginate_by = 8
 
     def get_queryset(self):
         qs = Post.objects.select_related('user').prefetch_related('likes')

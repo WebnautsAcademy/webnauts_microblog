@@ -8,6 +8,7 @@ class City(models.Model):
     def __str__(self):
         return self.title
 
+
 class Statistics(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='stats')
     date = models.DateField()
